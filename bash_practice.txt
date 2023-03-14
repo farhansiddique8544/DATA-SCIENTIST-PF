@@ -1,0 +1,91 @@
+conda create
+conda activate
+conda deactivate
+conda install
+conda update
+conda list
+conda env export
+conda env create
+conda create --name py35 python=3.7
+conda activate py35
+conda install tensorflow==1.14 keras==2.1.6 pytorch==1.2
+conda env export > py35.yml
+conda env remove -n myenv
+conda env create -f py35.yml
+
+
+# TASK # 1
+
+$ cp /home/farhan/git_bash_task/abc/* /abc/
+$ cp /home/farhan/git_bash_task/abc/* /d/
+
+$ ls -1 abc/*.jpeg | wc -l
+$  mkdir labels
+$ cd abc
+$ for file in *.jpeg; do     touch ../labels/${file%.*}.txt; done
+
+# TASK # 3
+
+mkdir final
+cd images
+for file in *.jpeg; do
+    if [ -f "../labels/${file%.jpeg}.txt" ]; then
+        cp "$file" "../final/"
+    fi
+done
+cd ../..
+
+
+# TASK # 4
+$ grep -r 'hello world' abc/*.py
+
+$ pip list | grep ten
+ps aux | grep notebook
+
+
+# TASK # 5
+
+# check if file path is provided as argument
+if [ $# -ne 1 ]; then
+  echo "Usage: $0 abc.py"
+  exit 1
+fi
+
+# check if file exists and is a regular file
+if [ ! -f "$1" ]; then
+  echo "Error: File not found: $1"
+  exit 1
+fi
+# search for "hello world" text in the file
+if grep -q "hello world" "$1"; then
+  echo "Yes"
+else
+  echo "Not"
+fi
+
+
+# TASK # 6
+
+# Replace "Software" with "IT".
+sed 's/Software/IT/g' employees.txt > temp.txt
+
+# Remove rows where Employee Age is less than 30
+awk -F',' '$3 >= 30' temp.txt > temp2.txt
+
+# Calculate average salary by department
+awk -F',' '{sum[$4] += $5; count[$4]++} END {for (dept in sum) 
+{printf("%s: %d\n", dept, int(sum[dept]/count[dept] + 0.5))}}' temp2.txt > avg_salary.txt
+
+# Combine the updated employee data with the average salaries by department
+awk 'NR==FNR{a[$1]=$2;next}{print $0 "," a[$4]}' avg_salary.txt temp2.txt > updated_employees.txt
+
+# Clean up temporary files
+rm temp.txt temp2.txt avg_salary.txt
+
+echo "Updated employee data saved to updated_employees.txt"
+
+
+
+
+
+
