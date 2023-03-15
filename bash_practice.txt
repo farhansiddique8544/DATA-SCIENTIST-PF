@@ -24,6 +24,14 @@ $  mkdir labels
 $ cd abc
 $ for file in *.jpeg; do     touch ../labels/${file%.*}.txt; done
 
+# TASK # 2
+mkdir repos_direc
+cd repos_direc/
+touch repos_file.txt (add url of repos)
+cat repo_list.txt | xargs -n 1 git clone
+chmod +x script_name.sh(run script file)
+./repo_script.sh (then run this commad)
+
 # TASK # 3
 
 mkdir final
