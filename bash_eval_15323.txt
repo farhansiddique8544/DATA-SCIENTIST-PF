@@ -1,0 +1,73 @@
+$ mkdir bash_eval
+
+$ cd bash_eval
+
+$ touch task.sh
+
+$ nano task.sh
+
+$ chmod +x task.sh
+
+$ ./task.sh
+$ nano task.sh
+read -p "Enter the directory path to be monitored: " directory_path
+
+bash_eval
+read -p "Enter a reg. expression pattern to match the 
+file names to be monitored: " file_pattern
+
+file in *.log *.txt
+
+# Validate the regular expression.
+if ! [[ "$file_pattern" =~ $file_pattern ]]; then
+    echo "Invalid regular expression pattern."
+    exit 1
+fi
+
+# Create the function that will be called whenever a file change is detected.
+function file_change_detected {
+    local file_path="$1"
+
+    # Use grep to search the file for a specific string.
+    if grep -q "error" "$file_path"; then
+
+        # Use awk to extract specific values from the line containing the string.
+        local extracted_value=$(grep "error" "$file_path" | awk '{print $NF}')
+
+        # Use cp to create a backup of the file in a separate backup directory.
+        backup_directory_path="./backup"
+        if [ -d "$backup_directory_path" ]; then
+            read -p "Backup directory already exists. Overwrite backup? (y/n): " overwrite_backup
+            if [ "$overwrite_backup" == "n" ]; then
+                backup_directory_path="$backup_directory_path-$(date +%Y-%m-%d-%H-%M-%S)"
+            fi
+        fi
+        mkdir -p "$backup_directory_path"
+        cp "$file_path" "$backup_directory_path"
+
+        # Use sed to modify the contents of the file by replacing the specific string with a new value.
+        sed -i 's/error/'"$extracted_value"'/g' "$file_path"
+
+        # If the modified file contains more than 10 lines, use head and tail to extract the first 5 and last 5 lines, respectively, and save them to a separate file.
+        if [ "$(wc -l < "$file_path")" -gt 10 ]; then
+            head -n 5 "$file_path" > "$file_path".head
+            tail -n 5 "$file_path" > "$file_path".tail
+        fi
+
+# Use tar to compress the backup directory and save it with a timestamp in the filename.
+
+backup_tar_file_name="backup-$(date +%Y-%m-%d-%H-%M-%S).tar.gz"
+tar -czf "$backup_tar_file_name" "$backup_directory_path"
+fi
+}
+
+# Use inotifywait to monitor the specified directory for changes to the files matching the specified regular expression pattern.
+while true; do
+inotifywait -e modify,create,delete -r "$directory_path" | grep -E "$file_pattern" | while read file_event; do
+file_path=$(echo "$file_event" | awk '{print $3}')
+file_change_detected "$file_path"
+    done
+done
+
+
+
